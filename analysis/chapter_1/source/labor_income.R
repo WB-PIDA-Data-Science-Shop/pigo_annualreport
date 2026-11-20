@@ -4,25 +4,11 @@ library(ggplot2)
 library(pigoar2026)
 library(purrr)
 
-theme_set(
-  theme_light() +
-    theme(
-      text = element_text(size = 22),
-      axis.text.x = element_text(size = 20, hjust = .5),
-      axis.text.y = element_text(size = 18),
-      plot.title = element_text(size = 22, face = "bold"),
-      plot.subtitle = element_text(size = 16),
-      plot.background = element_blank(),
-      plot.caption = element_text(hjust = 0, size = 12),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.border = element_blank(),
-      legend.position = "none",
-      strip.text = element_text(size = 20, face = "bold"),
-      legend.text = element_text(size = 18),
-      legend.title = element_text(size = 16, face = "bold")
-    )
+source(
+  here::here("R", "plot.R")
 )
+
+set_default_theme()
 
 set.seed(2027)
 
@@ -77,9 +63,6 @@ cliar_ctf <- ctf_dynamic |>
   left_join(
     pigoar2026::budget_execution |>
       mutate(year = as.integer(year)) |>
-      # classify_quantile() labels the highest values "Strong", so the
-      # absolute deviation from 100% execution is negated to make
-      # higher = better, in line with the closeness-to-frontier indicators
       mutate(
         budget_execution_rate = -abs(budget_execution_rate - 100)
       ),
@@ -103,7 +86,7 @@ plot_labor_income <- function(data, var) {
 
   quantile_baseline <- data |>
     filter(year == min_year) |>
-    classify_quantile(var, "year", threshold = "tercile") |>
+    classify_quantile(var, threshold = "tercile") |>
     select(country_code, quantile_indicator)
 
   data |>
